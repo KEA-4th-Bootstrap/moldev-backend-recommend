@@ -1,13 +1,21 @@
-from fastapi import FastAPI
+import os
 
-app = FastAPI()
+import click
+import uvicorn
 
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+from core.config import config
 
 
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+@click.command()
+def main():
+    uvicorn.run(
+        app="app.server:app",
+        host=config.APP_HOST,
+        port=config.APP_PORT,
+        reload=True,
+        workers=1,
+    )
+
+
+if __name__ == "__main__":
+    main()
