@@ -8,3 +8,8 @@ class CreateUserRequest(BaseModel):
     nickname: str = Field(..., description="Nickname")
     lat: float = Field(..., description="Lat")
     lng: float = Field(..., description="Lng")
+
+
+class UserItemModifyRequest(BaseModel):
+    id: int = Field(..., description="Member ID")
+    categories: list[str] = Field(..., description="Category List")
