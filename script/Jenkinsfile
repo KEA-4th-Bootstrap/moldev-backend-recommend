@@ -11,9 +11,8 @@ pipeline {
         stage('Add Config') {
             steps {
                 withCredentials([file(credentialsId: 'config-py-recommend', variable: 'CONFIG_PY')]) {
-                    sh 'chmod +w core' // 디렉토리에 쓰기 권한 부여
+                    sh 'chmod u+w core' // Jenkins 사용자에게 쓰기 권한 부여
                     sh 'cp ${CONFIG_PY} core/config.py' // 파일 복사
-                    sh 'chmod -w core' // 디렉토리의 쓰기 권한 제거
                 }
             }
         }
@@ -93,10 +92,4 @@ pipeline {
                     sh '''
                     git config --global user.name "${GIT_USERNAME}"
                     git config --global user.email "jenkins@company.com"
-                    git push -u origin main
-                    '''
-                }
-            }
-        }
-    }
-}
+ 
