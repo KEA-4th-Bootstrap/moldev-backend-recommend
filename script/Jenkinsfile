@@ -14,7 +14,6 @@ pipeline {
                     sh """
                             chmod +w .
                             cp ${CONFIG_PY} config.py
-                            chmod -w .
                     """
                 }
             }
