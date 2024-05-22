@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        CONFIG_FILE_PATH = ''
+    }
+
     stages {
         stage('Repository') {
             steps {
@@ -11,11 +15,14 @@ pipeline {
         stage('Add Config') {
             steps {
                 withCredentials([file(credentialsId: 'config-py-recommend', variable: 'CONFIG_PY')]) {
-                    sh """
-                            chmod +w .
-                            cp ${CONFIG_PY} config.py
-                            chmod -w .
-                    """
+                    script {
+                        env.CONFIG_FILE_PATH = CONFIG_PY
+                    }
+                    sh '''
+                        chmod +w $(pwd)
+                        cp $CONFIG_FILE_PATH config.py
+                        chmod -w $(pwd)
+                    '''
                 }
             }
         }
