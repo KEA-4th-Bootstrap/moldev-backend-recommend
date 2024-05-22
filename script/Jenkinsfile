@@ -11,6 +11,7 @@ pipeline {
         stage('Add Config') {
             steps {
                 withCredentials([file(credentialsId: 'config-py-recommend', variable: 'CONFIG_PY')]) {
+                    sh 'chmod +w core'
                     sh 'cp ${CONFIG_PY} core/config.py'
                 }
             }
