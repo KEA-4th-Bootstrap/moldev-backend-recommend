@@ -1,0 +1,100 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Repository') {
+            steps {
+                git branch: 'main', url: "https://github.com/KEA-4th-Bootstrap/moldev-backend-recommend"
+            }
+        }
+
+        stage('Add Config') {
+            steps {
+                withCredentials([file(credentialsId: 'config-py-recommend', variable: 'CONFIG_PY')]) {
+                    sh 'cp ${CONFIG_PY} core/config.py'
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'echo "Starting the build process..."'
+                
+            }
+            post {
+                always {
+                    jiraSendBuildInfo site: 'kea4bootstrap.atlassian.net'
+                }
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'kakao-jenkins-token', passwordVariable: 'PASSWORD_KEY', usernameVariable: 'USER_KEY')]) {
+                    sh "docker login gcu-bootstrap-dev.kr-central-2.kcr.dev --username ${USER_KEY} --password ${PASSWORD_KEY}"
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'docker-hub-name', variable: 'DOCKER_NAME'),
+                    string(credentialsId: 'docker-file-recommend', variable: 'DOCKER_FILE')
+                ]) {
+                    sh "docker build -t ${DOCKER_NAME}/${DOCKER_FILE}:${currentBuild.number} ."
+                    sh "docker tag ${DOCKER_NAME}/${DOCKER_FILE}:${currentBuild.number} gcu-bootstrap-dev.kr-central-2.kcr.dev/moldev-repository/${DOCKER_FILE}:${currentBuild.number}"
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'docker-file-recommend', variable: 'DOCKER_FILE')
+                ]) {
+                    sh "docker push gcu-bootstrap-dev.kr-central-2.kcr.dev/moldev-repository/${DOCKER_FILE}:${currentBuild.number}"
+                }
+            }
+        }
+
+        stage("Clone Manifest Git Repository") {
+            steps {
+                git(
+                    url: 'https://github.com/KEA-4th-Bootstrap/moldev-kubernetes-manifest',
+                    branch: "main",
+                    changelog: true,
+                    poll: true
+                )
+            }
+        }
+
+        stage("Update Manifest version changes") {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'docker-hub-name', variable: 'DOCKER_NAME'),
+                    string(credentialsId: 'docker-file-recommend', variable: 'DOCKER_FILE')
+                ]) {
+                    sh """
+                        cd recommend
+                        sed -i 's|gcu-bootstrap-dev.kr-central-2.kcr.dev/moldev-repository/.*|gcu-bootstrap-dev.kr-central-2.kcr.dev/moldev-repository/${DOCKER_FILE}:${currentBuild.number}|' deployment.yaml
+                        git add deployment.yaml
+                        git commit -m '[UPDATE] manifest ${currentBuild.number} image versioning'
+                    """
+                }
+            }
+        }
+
+        stage("Push to Git Repository") {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'git-jenkins-manifest', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    sh '''
+                    git config --global user.name "${GIT_USERNAME}"
+                    git config --global user.email "jenkins@company.com"
+                    git push -u origin main
+                    '''
+                }
+            }
+        }
+    }
+}
