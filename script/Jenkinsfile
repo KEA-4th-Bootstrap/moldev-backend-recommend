@@ -12,16 +12,16 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'config-py-recommend', variable: 'CONFIG_PY')]) {
                     script {
-                        env.CONFIG_FILE_PATH = CONFIG_PY
+                        def configPath = env.WORKSPACE + "/config.py"
+                        sh """
+                            # 현재 작업 디렉토리에 쓰기 권한 부여
+                            chmod +w .
+                            # config.py 파일을 작업 디렉토리에 복사
+                            cp ${CONFIG_PY} ${configPath}
+                            # 현재 작업 디렉토리의 쓰기 권한 제거
+                            chmod -w .
+                        """
                     }
-                    sh '''
-                        # 현재 작업 디렉토리에 쓰기 권한 부여
-                        chmod +w .
-                        # config.py 파일을 현재 작업 디렉토리에 복사
-                        cp $CONFIG_FILE_PATH config.py
-                        # 현재 작업 디렉토리의 쓰기 권한 제거
-                        chmod -w .
-                    '''
                 }
             }
         }
