@@ -11,9 +11,9 @@ pipeline {
         stage('Add Config') {
             steps {
                 withCredentials([file(credentialsId: 'config-py-recommend', variable: 'CONFIG_PY')]) {
-                    sh 'sudo chmod 777 core'
-                    sh 'sudo cp ${CONFIG_PY} core/config.py'
-                    sh 'sudo chmod 755 core'
+                    sh 'chmod +w core' // 디렉토리에 쓰기 권한 부여
+                    sh 'cp ${CONFIG_PY} core/config.py' // 파일 복사
+                    sh 'chmod -w core' // 디렉토리의 쓰기 권한 제거
                 }
             }
         }
