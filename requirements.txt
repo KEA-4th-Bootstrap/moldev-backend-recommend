@@ -5,3 +5,8 @@ click
 uvicorn
 pinecone-client
 dependency-injector
+pymongo[srv]
+kafka
+aiokafka
+openai
+numpy
