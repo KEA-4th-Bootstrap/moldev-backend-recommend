@@ -1,6 +1,6 @@
 from openai import AzureOpenAI
 
-from core.config import config
+from config import config
 
 import logging
 

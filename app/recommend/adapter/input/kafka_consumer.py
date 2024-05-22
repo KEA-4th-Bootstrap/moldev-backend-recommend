@@ -11,7 +11,7 @@ from app.recommend.adapter.output.azureai.category_gpt import GPTAdapter
 from app.recommend.adapter.output.mongo.post_categories_repository import PostCategoriesRepositoryAdapter
 from app.recommend.adapter.output.mongo.user_item_repository import UserItmeRepositoryAdapter
 from app.recommend.adapter.output.pinecone.repository import VectorRepositoryAdapter
-from core.config import config
+from config import config
 
 # env variables
 KAFKA_TOPIC = "update"

@@ -1,7 +1,7 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
-from core.config import config
+from config import config
 
 client = MongoClient(config.MONGO_DB_URL, server_api=ServerApi("1"))
 
