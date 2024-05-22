@@ -11,12 +11,11 @@ pipeline {
         stage('Add Config') {
             steps {
                 withCredentials([file(credentialsId: 'config-py-recommend', variable: 'CONFIG_PY')]) {
-                    // 작업 디렉토리에 쓰기 권한 부여
-                    sh 'chmod +w .'
-                    // config.py 파일을 현재 디렉토리에 복사
-                    sh 'cp ${CONFIG_PY} config.py'
-                    // 작업 디렉토리의 쓰기 권한 제거
-                    sh 'chmod -w .'
+                    sh """
+                            chmod +w .
+                            cp ${CONFIG_PY} config.py
+                            chmod -w .
+                    """
                 }
             }
         }
