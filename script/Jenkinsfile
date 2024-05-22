@@ -92,4 +92,11 @@ pipeline {
                     sh '''
                     git config --global user.name "${GIT_USERNAME}"
                     git config --global user.email "jenkins@company.com"
- 
+                    git push -u origin main
+                    '''
+                }
+            }
+        }
+    }
+}
+
