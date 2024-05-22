@@ -11,7 +11,7 @@ pipeline {
         stage('Add Config') {
             steps {
                 withCredentials([file(credentialsId: 'config-py-recommend', variable: 'CONFIG_PY')]) {
-                    sh 'cp ${CONFIG_PY} config.py'
+                    sh 'sudo cp ${CONFIG_PY} config.py'
                 }
             }
         }
