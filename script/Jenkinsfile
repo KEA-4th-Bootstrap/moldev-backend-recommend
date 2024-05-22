@@ -88,12 +88,8 @@ pipeline {
 
         stage("Push to Git Repository") {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'git-jenkins-manifest', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                    sh '''
-                    git config --global user.name "${GIT_USERNAME}"
-                    git config --global user.email "jenkins@company.com"
-                    git push -u origin main
-                    '''
+                withCredentials([gitUsernamePassword(credentialsId: 'git-jenkins-manifest', gitToolName: 'Default')]) {
+                    sh "git push -u origin main"
                 }
             }
         }
