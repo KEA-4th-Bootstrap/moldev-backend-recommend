@@ -5,12 +5,20 @@ from fastapi.responses import JSONResponse
 
 from app.container import Container
 from app.recommend.adapter.input import router as recommend_router
+from app.recommend.adapter.input.kafka_consumer import KafkaConsumerManager
 
 from core.exceptions import CustomException
 from core.fastapi.dependencies import Logging
 from core.fastapi.middlewares import (
     ResponseLogMiddleware,
 )
+
+import logging
+
+# initialize logger
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+log = logging.getLogger(__name__)
 
 
 def init_routers(app_: FastAPI) -> None:
@@ -27,6 +35,20 @@ def init_listeners(app_: FastAPI) -> None:
             status_code=exc.code,
             content={"error_code": exc.error_code, "message": exc.message},
         )
+
+
+def init_consumer(app_: FastAPI) -> None:
+    @app_.on_event("startup")
+    async def startup_event():
+        consumer_manager = KafkaConsumerManager.get_instance()
+        await consumer_manager.start_consumer()
+        log.info("Kafka consumer started")
+
+    @app_.on_event("shutdown")
+    async def shutdown_event():
+        consumer_manager = KafkaConsumerManager.get_instance()
+        await consumer_manager.stop_consumer()
+        log.info("Kafka consumer stopped")
 
 
 def make_middleware() -> list[Middleware]:
@@ -53,8 +75,10 @@ def create_app() -> FastAPI:
         dependencies=[Depends(Logging)],
         middleware=make_middleware(),
     )
+
     init_listeners(app_=app_)
     init_routers(app_=app_)
+    init_consumer(app_=app_)
     return app_
 
 
