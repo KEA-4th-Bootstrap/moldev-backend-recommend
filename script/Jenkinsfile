@@ -15,7 +15,7 @@ pipeline {
                         def configPath = env.WORKSPACE + "/config.py"
                         sh """
                             chmod -R +w ${env.WORKSPACE}
-                            cp -f ${CONFIG_PY} ${configPath}
+                            cp ${CONFIG_PY} ${configPath}
                             chmod -R -w ${env.WORKSPACE}
                         """
                     }
