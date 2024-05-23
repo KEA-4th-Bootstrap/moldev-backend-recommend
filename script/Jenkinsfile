@@ -16,6 +16,7 @@ pipeline {
                         sh """
                             chmod +w .
                             cp ${CONFIG_PY} ${configPath}
+                            chmod -w .
                         """
                     }
                 }
