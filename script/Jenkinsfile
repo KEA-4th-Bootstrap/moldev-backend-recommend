@@ -13,7 +13,7 @@ pipeline {
                 withCredentials([file(credentialsId: 'config-py-recommend', variable: 'CONFIG_PY')]) {
                     script {
                         sh """
-                            cp -f ${CONFIG_PY} .py
+                            cp -f ${CONFIG_PY} config.py
                         """
                     }
                 }
