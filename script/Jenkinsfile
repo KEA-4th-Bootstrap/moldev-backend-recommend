@@ -1,20 +1,19 @@
 pipeline {
     agent any
+    
     stages {
         stage('Repository') {
             steps {
                 git branch: 'main', url: "https://github.com/KEA-4th-Bootstrap/moldev-backend-recommend"
             }
         }
+        
         stage('Add Config') {
             steps {
                 withCredentials([file(credentialsId: 'config-py-recommend', variable: 'CONFIG_PY')]) {
                     script {
-                        def configPath = env.WORKSPACE + "/config.py"
                         sh """
-                            chmod +w .
-                            cp ${CONFIG_PY} ${configPath}
-                            chmod -w .
+                            cp -f ${CONFIG_PY} .py
                         """
                     }
                 }
@@ -23,7 +22,6 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'echo "Starting the build process..."'
-                // 빌드 단계 추가
             }
             post {
                 always {
