@@ -1,28 +1,24 @@
 pipeline {
     agent any
-
     stages {
         stage('Repository') {
             steps {
                 git branch: 'main', url: "https://github.com/KEA-4th-Bootstrap/moldev-backend-recommend"
             }
         }
-
         stage('Add Config') {
             steps {
                 withCredentials([file(credentialsId: 'config-py-recommend', variable: 'CONFIG_PY')]) {
                     script {
                         def configPath = env.WORKSPACE + "/config.py"
                         sh """
-                            chmod -R +w ${env.WORKSPACE}
-                            cp ${CONFIG_PY} ${configPath}
-                            chmod -R -w ${env.WORKSPACE}
+                            chmod +w .
+                            cp -f ${CONFIG_PY} ${configPath}
                         """
                     }
                 }
             }
         }
-
         stage('Build') {
             steps {
                 sh 'echo "Starting the build process..."'
@@ -34,7 +30,6 @@ pipeline {
                 }
             }
         }
-
         stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'kakao-jenkins-token', passwordVariable: 'PASSWORD_KEY', usernameVariable: 'USER_KEY')]) {
@@ -42,7 +37,6 @@ pipeline {
                 }
             }
         }
-
         stage('Build Docker Image') {
             steps {
                 withCredentials([
@@ -54,7 +48,6 @@ pipeline {
                 }
             }
         }
-
         stage('Push Docker Image') {
             steps {
                 withCredentials([
@@ -64,7 +57,6 @@ pipeline {
                 }
             }
         }
-
         stage("Clone Manifest Git Repository") {
             steps {
                 git(
@@ -75,7 +67,6 @@ pipeline {
                 )
             }
         }
-
         stage("Update Manifest version changes") {
             steps {
                 withCredentials([
@@ -91,7 +82,6 @@ pipeline {
                 }
             }
         }
-
         stage("Push to Git Repository") {
             steps {
                 withCredentials([gitUsernamePassword(credentialsId: 'git-jenkins-manifest', gitToolName: 'Default')]) {
