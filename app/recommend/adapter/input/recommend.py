@@ -17,7 +17,9 @@ log = logging.getLogger(__name__)
 recommend_router = APIRouter()
 
 
-@recommend_router.get
+@recommend_router.get(
+    ""
+)
 @inject
 async def get_recommendation(
         request: Request,
