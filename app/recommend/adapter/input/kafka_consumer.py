@@ -123,7 +123,7 @@ class KafkaConsumerManager:
         else:
             # 카테고리 추출 후 저장, 사용자 아이템 업데이트
             categories = await self.gpt_adapter.extract_category(content)
-            log.info(f"categories: {categories['categories']}")
+            log.info(f"categories: {categories}")
             await self.post_categories_repo.insert_post_categories(post_id, categories.split(","))
             await self.user_item_repo.inc_items(member_id, categories.split(","))
 
