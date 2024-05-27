@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from dependency_injector.wiring import Provide, inject
-from fastapi import APIRouter, Depends, Query, Path
+from fastapi import APIRouter, Depends, Query, Path, Request
 
 from app.container import Container
 from app.recommend.adapter.input.request import UserItemModifyRequest
@@ -22,9 +22,10 @@ recommend_router = APIRouter()
 )
 @inject
 async def get_recommendation(
-        member_id: Annotated[int, Path(title="The ID of the item to get")],
+        request: Request,
         recommend_service: RecommendService = Depends(Provide[Container.recommend_service])
 ):
+    member_id = int(request.headers.get("Authorization"))
     return await recommend_service.get_recommend(member_id)
 
 
