@@ -13,6 +13,12 @@ from app.recommend.adapter.output.mongo.user_item_repository import UserItmeRepo
 from app.recommend.adapter.output.pinecone.repository import VectorRepositoryAdapter
 from config import config
 
+categories = [
+    "백엔드", "프론트엔드", "인공지능", "데브옵스", "인프라", "웹", "서버", "데이터베이스", "리눅스", "앱 네이티브",
+    "플러터", "자바스크립트", "어셈블리", "딥러닝", "머신러닝", "데이터과학", "대외활동", "동아리", "공모전", "해커톤",
+    "트러블슈팅", "네트워크", "운영체제", "컴퓨터구조", "알고리즘", "자료구조", "코딩테스트"
+]
+
 # env variables
 KAFKA_TOPIC = "update"
 KAFKA_CONSUMER_GROUP_PREFIX = os.getenv('KAFKA_CONSUMER_GROUP_PREFIX', 'group')
@@ -114,6 +120,7 @@ class KafkaConsumerManager:
         member_id = json.loads(message.value).get("memberId")
         post_id = json.loads(message.value).get("postId")
         log.info(f"member_id: {member_id}, post_id: {post_id}")
+        await self.validate_user(member_id)
 
         if content is None:
             # 카테고리 조회 후 해당 사용자 아이템 업데이트
@@ -132,3 +139,8 @@ class KafkaConsumerManager:
         log.info(items)
         items = normalize_values(items)
         await self.vector_repo.upsert_data(items)
+
+    async def validate_user(self, user_id: int):
+        user_item = await self.user_item_repo.get_user_item(user_id)
+        if not user_item:
+            await self.user_item_repo.insert_user_item(user_id, {category: 0 for category in categories})
