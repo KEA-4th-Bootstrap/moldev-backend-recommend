@@ -16,5 +16,5 @@ class VectorRepositoryAdapter:
         return index.query(
             namespace="categories",
             id=str(member_id),
-            top_k=2
+            top_k=6
         )

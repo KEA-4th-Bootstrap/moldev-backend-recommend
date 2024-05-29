@@ -64,7 +64,7 @@ class RecommendService:
 
     async def get_recommend(self, member_id: int):
         result = await self.vector_repo.get_k_near(member_id)
-        ids = [result.get("matches")[i].get("id") for i in range(2)]
+        ids = [result.get("matches")[i].get("id") for i in range(1, 6)]
         url = "http://member-service.backend.svc.cluster.local:80/api/member/recommend"
         params = {
             "memberIds": ids
