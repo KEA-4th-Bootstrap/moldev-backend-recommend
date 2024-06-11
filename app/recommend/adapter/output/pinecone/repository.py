@@ -18,3 +18,6 @@ class VectorRepositoryAdapter:
             id=str(member_id),
             top_k=6
         )
+
+    async def delete_all(self):
+        index.delete(namespace="categories", delete_all=True)

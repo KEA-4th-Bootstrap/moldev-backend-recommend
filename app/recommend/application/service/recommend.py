@@ -97,3 +97,6 @@ class RecommendService:
         user_item = await self.user_item_repo.get_user_item(user_id)
         if not user_item:
             await self.user_item_repo.insert_user_item(user_id, {category: 0 for category in categories})
+
+    async def delete_all_vector(self):
+        await self.vector_repo.delete_all()

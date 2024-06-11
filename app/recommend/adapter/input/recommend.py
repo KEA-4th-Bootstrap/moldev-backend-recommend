@@ -72,3 +72,13 @@ async def get_post_categories(
 ):
     log.info(f"post_content: {post_content}")
     return await recommend_service.extract_categories(post_content)
+
+@recommend_router.delete(
+    "/vector"
+)
+@inject
+async def delete_all_vector(
+        recommend_service: RecommendService = Depends(Provide[Container.recommend_service])
+):
+    await recommend_service.delete_all_vector()
+    return "Good Bye Vector!"
